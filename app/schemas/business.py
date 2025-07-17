@@ -15,7 +15,14 @@ class BusinessBase(SQLModel):
     contact_phone: Optional[str] = None
 
 
-class BusinessCreate(BusinessBase):
+class BusinessCreate(SQLModel):
+    name: str
+    description: Optional[str] = None
+    type: BusinessType
+    address: Optional[str] = None
+    contact_email: Optional[EmailStr] = None
+    contact_phone: Optional[str] = None
+
     @field_validator('name')
     @classmethod
     def validate_name(cls, v: str) -> str:

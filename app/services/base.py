@@ -19,7 +19,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return db.exec(statement).all()
 
     def create(self, db: Session, *, obj_in: CreateSchemaType) -> ModelType:
-        db_obj = self.model(**obj_in.dict())
+        db_obj = self.model(**obj_in.model_dump())
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)

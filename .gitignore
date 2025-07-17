@@ -9,3 +9,5 @@ venv
 .vscode
 Pipfile.lock
 connector.db
+.pytest_cache
+test.db

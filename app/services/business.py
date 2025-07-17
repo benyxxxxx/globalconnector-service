@@ -1,4 +1,5 @@
 from sqlmodel import Session, select, and_, or_
+from datetime import timezone
 from typing import Optional, List
 from datetime import datetime
 import uuid
@@ -34,7 +35,7 @@ class BusinessCRUD:
         existing_business = self.session.exec(statement).first()
         return existing_business is not None
     
-    def create(self, business_create: BusinessCreate) -> Business:
+    def create(self, business_create: BusinessCreate, owner_id: str) -> Business:
         """Create a new business"""
         business_id = self.generate_business_id()
         
@@ -44,11 +45,12 @@ class BusinessCRUD:
             raise BusinessAlreadyExistsException(business_id)
         
         # Check for name conflict within owner's businesses
-        if self.check_name_conflict(business_create.name, business_create.owner_id):
-            raise BusinessNameConflictException(business_create.name, business_create.owner_id)
+        if self.check_name_conflict(business_create.name, owner_id):
+            raise BusinessNameConflictException(business_create.name, owner_id)
         
         # Create business
-        business_data = business_create.dict()
+        business_data = business_create.model_dump()
+        business_data['owner_id'] = owner_id
         business = Business(id=business_id, **business_data)
         
         self.session.add(business)
@@ -112,13 +114,13 @@ class BusinessCRUD:
                    .offset(skip).limit(limit).order_by(Business.created_at.desc())
         return self.session.exec(statement).all()
     
-    def update(self, business_id: str, business_update: BusinessUpdate) -> Business:
+    def update(self, business_id: str, business_update: BusinessUpdate, user_id: str) -> Business:
         """Update business"""
         business = self.get_by_id(business_id)
         if not business:
             raise BusinessNotFoundException(business_id)
         
-        update_data = business_update.dict(exclude_unset=True)
+        update_data = business_update.model_dump(exclude_unset=True)
         
         # Check for name conflict if name is being updated
         if 'name' in update_data:
@@ -127,22 +129,29 @@ class BusinessCRUD:
             
             if self.check_name_conflict(new_name, owner_id, exclude_id=business_id):
                 raise BusinessNameConflictException(new_name, owner_id)
-        
+
+        if user_id != business.owner_id:
+            raise UnauthorizedBusinessAccessException(business_id)
+            
         # Apply updates
         for field, value in update_data.items():
             setattr(business, field, value)
         
-        business.updated_at = datetime.utcnow()
+        business.updated_at = datetime.now(timezone.utc)
         self.session.add(business)
         self.session.commit()
         self.session.refresh(business)
         return business
     
-    def delete(self, business_id: str) -> bool:
+    def delete(self, business_id: str, user_id: str) -> bool:
         """Delete business"""
         business = self.get_by_id(business_id)
+
         if not business:
             raise BusinessNotFoundException(business_id)
+
+        if user_id != business.owner_id:
+            raise UnauthorizedBusinessAccessException(business_id)
         
         self.session.delete(business)
         self.session.commit()
@@ -189,4 +198,4 @@ class BusinessCRUD:
         from sqlmodel import func
         
         statement = select(func.count(Business.id)).where(Business.owner_id == owner_id)
-        return self.session.exec(statement).one()
+    #     return self.session.exec(statement).one()

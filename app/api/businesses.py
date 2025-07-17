@@ -10,16 +10,19 @@ from app.schemas.business import (
 from app.models.business import BusinessType
 from app.services.business import BusinessCRUD
 from app.api.deps import get_business_crud
+from app.auth import get_current_user_id
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user_id)])
 
 @router.post("/", response_model=BusinessResponse, status_code=status.HTTP_201_CREATED)
 async def create_business(
     business_create: BusinessCreate,
+    user_id: int = Depends(get_current_user_id),
     business_crud: BusinessCRUD = Depends(get_business_crud)
 ):
     """Create a new business"""
-    return business_crud.create(business_create)
+    return business_crud.create(business_create, user_id)
+
 
 @router.get("/{business_id}", response_model=BusinessResponse)
 async def get_business(
@@ -43,7 +46,7 @@ async def get_businesses(
     business_type: Optional[BusinessType] = Query(None, alias="type"),
     name: Optional[str] = Query(None),
     location: Optional[str] = Query(None),
-    business_crud: BusinessCRUD = Depends(get_business_crud)
+    business_crud: BusinessCRUD = Depends(get_business_crud),
 ):
     """Get all businesses with optional filtering"""
     filters = BusinessFilter(
@@ -64,74 +67,30 @@ async def get_owner_businesses(
     """Get businesses by owner ID"""
     return business_crud.get_by_owner_id(owner_id, skip=skip, limit=limit)
 
-@router.get("/type/{business_type}", response_model=List[BusinessResponse])
-async def get_businesses_by_type(
-    business_type: BusinessType,
-    skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=1000),
-    business_crud: BusinessCRUD = Depends(get_business_crud)
-):
-    """Get businesses by type"""
-    return business_crud.get_by_type(business_type, skip=skip, limit=limit)
-
-@router.get("/search/name", response_model=List[BusinessResponse])
-async def search_businesses_by_name(
-    name: str = Query(..., min_length=2),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=1000),
-    business_crud: BusinessCRUD = Depends(get_business_crud)
-):
-    """Search businesses by name"""
-    return business_crud.search_by_name(name, skip=skip, limit=limit)
-
-@router.get("/search/location", response_model=List[BusinessResponse])
-async def search_businesses_by_location(
-    location: str = Query(..., min_length=2),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=1000),
-    business_crud: BusinessCRUD = Depends(get_business_crud)
-):
-    """Search businesses by location"""
-    return business_crud.search_by_location(location, skip=skip, limit=limit)
-
 @router.put("/{business_id}", response_model=BusinessResponse)
 async def update_business(
     business_id: str,
     business_update: BusinessUpdate,
-    business_crud: BusinessCRUD = Depends(get_business_crud)
+    business_crud: BusinessCRUD = Depends(get_business_crud),
+    user_id: int = Depends(get_current_user_id),
 ):
     """Update business by ID"""
-    return business_crud.update(business_id, business_update)
+    return business_crud.update(business_id, business_update, user_id=user_id)
 
 @router.delete("/{business_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_business(
     business_id: str,
-    business_crud: BusinessCRUD = Depends(get_business_crud)
+    business_crud: BusinessCRUD = Depends(get_business_crud),
+    user_id: int = Depends(get_current_user_id),
 ):
     """Delete business by ID"""
-    business_crud.delete(business_id)
+    business_crud.delete(business_id, user_id)
 
-@router.patch("/{business_id}/transfer", response_model=BusinessResponse)
-async def transfer_business_ownership(
-    business_id: str,
-    new_owner_id: str = Query(...),
-    business_crud: BusinessCRUD = Depends(get_business_crud)
-):
-    """Transfer business ownership"""
-    return business_crud.transfer_ownership(business_id, new_owner_id)
-
-@router.get("/stats/count-by-type", response_model=dict)
-async def get_business_stats_by_type(
-    business_crud: BusinessCRUD = Depends(get_business_crud)
-):
-    """Get count of businesses by type"""
-    return business_crud.get_business_count_by_type()
-
-@router.get("/owner/{owner_id}/count", response_model=dict)
-async def get_owner_business_count(
-    owner_id: str,
-    business_crud: BusinessCRUD = Depends(get_business_crud)
-):
-    """Get count of businesses owned by a specific owner"""
-    count = business_crud.get_businesses_by_owner_count(owner_id)
-    return {"owner_id": owner_id, "business_count": count}
+# @router.patch("/{business_id}/transfer", response_model=BusinessResponse)
+# async def transfer_business_ownership(
+#     business_id: str,
+#     new_owner_id: str = Query(...),
+#     business_crud: BusinessCRUD = Depends(get_business_crud)
+# ):
+#     """Transfer business ownership"""
+#     return business_crud.transfer_ownership(business_id, new_owner_id)
