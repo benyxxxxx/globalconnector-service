@@ -17,6 +17,9 @@ class BusinessType(str, Enum):
     OTHER = "other"
 
 class Business(SQLModel, table=True):
+
+    __tablename__ = "businesses"
+
     id: str = Field(primary_key=True)
     owner_id: str = Field(index=True)
     name: str = Field(index=True)
@@ -25,5 +28,6 @@ class Business(SQLModel, table=True):
     address: Optional[str] = Field(default=None)
     contact_email: Optional[EmailStr] = Field(default=None)
     contact_phone: Optional[str] = Field(default=None)
+
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: Optional[datetime] = Field(default=None)
+    updated_at: datetime = Field(default=None)
