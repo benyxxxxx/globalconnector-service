@@ -8,3 +8,4 @@ venv
 .venv
 .vscode
 Pipfile.lock
+connector.db
