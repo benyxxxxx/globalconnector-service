@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from typing import List, Optional, Dict, Any
 from enum import Enum
 from sqlmodel import SQLModel, Field, Relationship, JSON, Column
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, model_validator
 
 
 # Enums
@@ -33,11 +33,18 @@ class PricingTier(BaseModel):
 
 class Pricing(BaseModel):
     type: PricingType
+    currency: str
     base_price: float
     time_unit: Optional[TimeUnit] = None
     tiers: Optional[List[PricingTier]] = None
     min_duration: Optional[int] = None
     max_duration: Optional[int] = None
+
+    @model_validator(mode="after")
+    def validate_time_unit_required(self) -> 'Pricing':
+        if self.type == PricingType.TIME_BASED and self.time_unit is None:
+            raise ValueError("time_unit is required when pricing type is 'time_based'")
+        return self
 
 
 class VariantOption(BaseModel):
@@ -69,8 +76,8 @@ class Service(SQLModel, table=True):
     # JSON field for variants
     variants: Optional[List[Variant]] = Field(default=None, sa_column=Column(JSON))
     
-    # JSON field for flexible metadata
+    # JSON field for flexible 
     attributes: Optional[Dict[str, Any]] = Field(default=None, sa_column=Column(JSON))
     
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = Field(default=None)
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

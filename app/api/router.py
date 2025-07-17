@@ -1,5 +1,6 @@
 from fastapi import APIRouter
-from app.api import businesses
+from app.api import businesses, services
 
 api_router = APIRouter()
 api_router.include_router(businesses.router, prefix="/businesses", tags=["businesses"])
+api_router.include_router(services.router, prefix="/services", tags=["services"])

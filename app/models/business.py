@@ -30,4 +30,4 @@ class Business(SQLModel, table=True):
     contact_phone: Optional[str] = Field(default=None)
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = Field(default=None)
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
