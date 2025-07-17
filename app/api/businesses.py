@@ -5,7 +5,6 @@ from app.schemas.business import (
     BusinessUpdate,
     BusinessResponse,
     BusinessFilter,
-    BusinessSummary,
 )
 from app.models.business import BusinessType
 from app.services.business import BusinessCRUD
@@ -18,11 +17,10 @@ router = APIRouter(dependencies=[Depends(get_current_user_id)])
 @router.post("/", response_model=BusinessResponse, status_code=status.HTTP_201_CREATED)
 async def create_business(
     business_create: BusinessCreate,
-    user_id: int = Depends(get_current_user_id),
     business_crud: BusinessCRUD = Depends(get_business_crud),
 ):
     """Create a new business"""
-    return business_crud.create(business_create, user_id)
+    return business_crud.create(business_create)
 
 
 @router.get("/", response_model=List[BusinessResponse])
@@ -46,11 +44,10 @@ async def get_businesses(
 async def get_owner_businesses(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
-    user_id: str = Depends(get_current_user_id),
     business_crud: BusinessCRUD = Depends(get_business_crud),
 ):
     """Get businesses by owner ID"""
-    return business_crud.get_by_owner_id(user_id, skip=skip, limit=limit)
+    return business_crud.get_by_owner_id(business_crud.current_user_id, skip=skip, limit=limit)
 
 
 @router.get("/{business_id}", response_model=BusinessResponse)
@@ -72,27 +69,15 @@ async def update_business(
     business_id: str,
     business_update: BusinessUpdate,
     business_crud: BusinessCRUD = Depends(get_business_crud),
-    user_id: int = Depends(get_current_user_id),
 ):
     """Update business by ID"""
-    return business_crud.update(business_id, business_update, user_id=user_id)
+    return business_crud.update(business_id, business_update)
 
 
 @router.delete("/{business_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_business(
     business_id: str,
     business_crud: BusinessCRUD = Depends(get_business_crud),
-    user_id: int = Depends(get_current_user_id),
 ):
     """Delete business by ID"""
-    business_crud.delete(business_id, user_id)
-
-
-# @router.patch("/{business_id}/transfer", response_model=BusinessResponse)
-# async def transfer_business_ownership(
-#     business_id: str,
-#     new_owner_id: str = Query(...),
-#     business_crud: BusinessCRUD = Depends(get_business_crud)
-# ):
-#     """Transfer business ownership"""
-#     return business_crud.transfer_ownership(business_id, new_owner_id)
+    business_crud.delete(business_id)
