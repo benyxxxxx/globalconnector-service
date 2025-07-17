@@ -23,27 +23,27 @@ class BusinessCreate(SQLModel):
     contact_email: Optional[EmailStr] = None
     contact_phone: Optional[str] = None
 
-    @field_validator('name')
+    @field_validator("name")
     @classmethod
     def validate_name(cls, v: str) -> str:
         if not v or not v.strip():
-            raise ValueError('Business name cannot be empty')
+            raise ValueError("Business name cannot be empty")
         if len(v.strip()) < 2:
-            raise ValueError('Business name must be at least 2 characters long')
+            raise ValueError("Business name must be at least 2 characters long")
         return v.strip()
 
-    @field_validator('contact_phone')
+    @field_validator("contact_phone")
     @classmethod
     def validate_phone(cls, v: Optional[str]) -> Optional[str]:
         if v and len(v.strip()) < 10:
-            raise ValueError('Contact phone must be at least 10 characters long')
+            raise ValueError("Contact phone must be at least 10 characters long")
         return v.strip() if v else None
 
-    @field_validator('description')
+    @field_validator("description")
     @classmethod
     def validate_description(cls, v: Optional[str]) -> Optional[str]:
         if v and len(v.strip()) > 1000:
-            raise ValueError('Description cannot exceed 1000 characters')
+            raise ValueError("Description cannot exceed 1000 characters")
         return v.strip() if v else None
 
 
@@ -56,29 +56,29 @@ class BusinessUpdate(SQLModel):
     contact_email: Optional[EmailStr] = None
     contact_phone: Optional[str] = None
 
-    @field_validator('name')
+    @field_validator("name")
     @classmethod
     def validate_name(cls, v: Optional[str]) -> Optional[str]:
         if v is not None:
             if not v.strip():
-                raise ValueError('Business name cannot be empty')
+                raise ValueError("Business name cannot be empty")
             if len(v.strip()) < 2:
-                raise ValueError('Business name must be at least 2 characters long')
+                raise ValueError("Business name must be at least 2 characters long")
             return v.strip()
         return v
 
-    @field_validator('contact_phone')
+    @field_validator("contact_phone")
     @classmethod
     def validate_phone(cls, v: Optional[str]) -> Optional[str]:
         if v and len(v.strip()) < 10:
-            raise ValueError('Contact phone must be at least 10 characters long')
+            raise ValueError("Contact phone must be at least 10 characters long")
         return v.strip() if v else None
 
-    @field_validator('description')
+    @field_validator("description")
     @classmethod
     def validate_description(cls, v: Optional[str]) -> Optional[str]:
         if v and len(v.strip()) > 1000:
-            raise ValueError('Description cannot exceed 1000 characters')
+            raise ValueError("Description cannot exceed 1000 characters")
         return v.strip() if v else None
 
 
@@ -104,6 +104,7 @@ class BusinessFilter(SQLModel):
 
 class BusinessSummary(SQLModel):
     """Lightweight business info for listings"""
+
     id: str
     name: str
     type: BusinessType

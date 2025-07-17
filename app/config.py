@@ -3,6 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import field_validator
 from typing import List
 
+
 class Settings(BaseSettings):
     PROJECT_NAME: str = "GlobalConnector"
     VERSION: str = "1.0.0"
@@ -22,5 +23,6 @@ class Settings(BaseSettings):
         if not v or not v.strip():
             raise ValueError(f"{info.field_name.upper()} must not be empty")
         return v
+
 
 settings = Settings()

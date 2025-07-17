@@ -40,11 +40,11 @@ class Pricing(BaseModel):
     min_duration: Optional[int] = None
     max_duration: Optional[int] = None
 
-    @model_validator(mode="after")
-    def validate_time_unit_required(self) -> 'Pricing':
-        if self.type == PricingType.TIME_BASED and self.time_unit is None:
-            raise ValueError("time_unit is required when pricing type is 'time_based'")
-        return self
+    # @model_validator(mode="after")
+    # def validate_time_unit_required(self) -> 'Pricing':
+    #     if self.type == PricingType.TIME_BASED and self.time_unit is None:
+    #         raise ValueError("time_unit is required when pricing type is 'time_based'")
+    #     return self
 
 
 class VariantOption(BaseModel):
@@ -69,15 +69,16 @@ class Service(SQLModel, table=True):
     name: str = Field(index=True)
     description: Optional[str] = None
     business_id: str = Field(foreign_key="businesses.id", index=True)
-    
+    owner_id: str = Field(index=True)
+
     # JSON field for pricing
     pricing: Pricing = Field(sa_column=Column(JSON))
-    
+
     # JSON field for variants
     variants: Optional[List[Variant]] = Field(default=None, sa_column=Column(JSON))
-    
-    # JSON field for flexible 
+
+    # JSON field for flexible
     attributes: Optional[Dict[str, Any]] = Field(default=None, sa_column=Column(JSON))
-    
+
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

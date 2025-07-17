@@ -1,8 +1,8 @@
-
 from datetime import datetime
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, ConfigDict
 from app.models.service import Pricing, Variant
+
 
 # Request/Response Models
 class ServiceCreate(BaseModel):

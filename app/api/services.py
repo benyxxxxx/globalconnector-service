@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Query
 from sqlmodel import Session
 from typing import List
 from app.database import get_session  # Your DB session dependency
@@ -19,8 +19,17 @@ def list_services(
     return crud.list_all()
 
 
-# @router.post("/", response_model=ServiceResponse, status_code=status.HTTP_201_CREATED)
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.get("/my", response_model=List[ServiceResponse])
+async def get_owner_businesses(
+    session: Session = Depends(get_session),
+    current_user_id: str = Depends(get_current_user_id),
+):
+    """Get businesses by owner ID"""
+    crud = ServiceCRUD(session, current_user_id)
+    return crud.get_by_owner_id()
+
+
+@router.post("/", response_model=ServiceResponse, status_code=status.HTTP_201_CREATED)
 async def create_service(
     service_in: ServiceCreate,
     session: Session = Depends(get_session),

@@ -5,6 +5,7 @@ from datetime import datetime
 from enum import Enum
 from pydantic import EmailStr
 
+
 class BusinessType(str, Enum):
     RESTAURANT = "restaurant"
     HOSTEL = "hostel"
@@ -15,6 +16,7 @@ class BusinessType(str, Enum):
     ACTIVITY = "activity"
     SPA = "spa"
     OTHER = "other"
+
 
 class Business(SQLModel, table=True):
 

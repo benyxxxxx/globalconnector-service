@@ -1,10 +1,12 @@
 from typing import List, Optional
-from sqlmodel import select, Session
+from sqlmodel import select, Session, and_
 from fastapi import HTTPException
 from datetime import datetime, timezone
 from uuid import uuid4
 from app.models.service import Service
 from app.schemas.service import ServiceCreate, ServiceUpdate
+from app.utils.service_exception import ServiceAlreadyExistsException
+
 
 class ServiceCRUD:
     def __init__(self, session: Session, current_user_id: str):
@@ -19,7 +21,6 @@ class ServiceCRUD:
         # Optionally check ownership here if needed
         return service
 
-
     def list_all(self) -> List[Service]:
         statement = select(Service)
         return self.session.exec(statement).all()
@@ -28,7 +29,35 @@ class ServiceCRUD:
         statement = select(Service).where(Service.business_id == business_id)
         return self.session.exec(statement).all()
 
+    def get_by_owner_id(self) -> List[Service]:
+        """Get service by owner ID"""
+        statement = (
+            select(Service)
+            .where()
+            .where(Service.owner_id == self.current_user_id)
+            .order_by(Service.created_at.desc())
+        )
+        return self.session.exec(statement).all()
+
+    def check_name_conflict(
+        self, name: str, business_id: str, exclude_id: Optional[str] = None
+    ) -> bool:
+        """Check if service name already exists for the business"""
+        statement = select(Service).where(
+            and_(Service.name == name, Service.business_id == business_id)
+        )
+
+        if exclude_id:
+            statement = statement.where(Service.id != exclude_id)
+
+        existing_service = self.session.exec(statement).first()
+        return existing_service is not None
+
     def create(self, service_in: ServiceCreate) -> Service:
+
+        if self.check_name_conflict(service_in.name, service_in.business_id):
+            raise ServiceAlreadyExistsException(service_in.name, service_in.business_id)
+
         service = Service(
             id=str(uuid4()),
             name=service_in.name,
@@ -37,7 +66,7 @@ class ServiceCRUD:
             business_id=service_in.business_id,
             pricing=service_in.pricing.model_dump(),
             variants=service_in.variants,
-            attributes=service_in.attributes,  
+            attributes=service_in.attributes,
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),
         )
@@ -49,13 +78,16 @@ class ServiceCRUD:
     def update(self, service_id: str, service_in: ServiceUpdate) -> Service:
         service = self.get(service_id)
         if service.owner_id != self.current_user_id:
-            raise HTTPException(status_code=403, detail="Not authorized to update this service")
+            raise HTTPException(
+                status_code=403, detail="Not authorized to update this service"
+            )
 
         for field, value in service_in.model_dump(exclude_unset=True).items():
             if field == "attributes":
                 setattr(service, "attributes", value)
             else:
                 setattr(service, field, value)
+
         service.updated_at = datetime.now(timezone.utc)
         self.session.add(service)
         self.session.commit()
@@ -65,6 +97,8 @@ class ServiceCRUD:
     def delete(self, service_id: str) -> None:
         service = self.get(service_id)
         if service.owner_id != self.current_user_id:
-            raise HTTPException(status_code=403, detail="Not authorized to delete this service")
+            raise HTTPException(
+                status_code=403, detail="Not authorized to delete this service"
+            )
         self.session.delete(service)
         self.session.commit()

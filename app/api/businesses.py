@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from typing import List, Optional
 from app.schemas.business import (
-    BusinessCreate, 
-    BusinessUpdate, 
-    BusinessResponse, 
+    BusinessCreate,
+    BusinessUpdate,
+    BusinessResponse,
     BusinessFilter,
-    BusinessSummary
+    BusinessSummary,
 )
 from app.models.business import BusinessType
 from app.services.business import BusinessCRUD
@@ -14,29 +14,16 @@ from app.auth import get_current_user_id
 
 router = APIRouter(dependencies=[Depends(get_current_user_id)])
 
+
 @router.post("/", response_model=BusinessResponse, status_code=status.HTTP_201_CREATED)
 async def create_business(
     business_create: BusinessCreate,
     user_id: int = Depends(get_current_user_id),
-    business_crud: BusinessCRUD = Depends(get_business_crud)
+    business_crud: BusinessCRUD = Depends(get_business_crud),
 ):
     """Create a new business"""
     return business_crud.create(business_create, user_id)
 
-
-@router.get("/{business_id}", response_model=BusinessResponse)
-async def get_business(
-    business_id: str,
-    business_crud: BusinessCRUD = Depends(get_business_crud)
-):
-    """Get business by ID"""
-    business = business_crud.get_by_id(business_id)
-    if not business:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Business with id {business_id} not found"
-        )
-    return business
 
 @router.get("/", response_model=List[BusinessResponse])
 async def get_businesses(
@@ -50,22 +37,35 @@ async def get_businesses(
 ):
     """Get all businesses with optional filtering"""
     filters = BusinessFilter(
-        owner_id=owner_id,
-        type=business_type,
-        name=name,
-        location=location
+        owner_id=owner_id, type=business_type, name=name, location=location
     )
     return business_crud.get_all(skip=skip, limit=limit, filters=filters)
 
-@router.get("/owner/{owner_id}", response_model=List[BusinessResponse])
+
+@router.get("/my", response_model=List[BusinessResponse])
 async def get_owner_businesses(
-    owner_id: str,
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
-    business_crud: BusinessCRUD = Depends(get_business_crud)
+    user_id: str = Depends(get_current_user_id),
+    business_crud: BusinessCRUD = Depends(get_business_crud),
 ):
     """Get businesses by owner ID"""
-    return business_crud.get_by_owner_id(owner_id, skip=skip, limit=limit)
+    return business_crud.get_by_owner_id(user_id, skip=skip, limit=limit)
+
+
+@router.get("/{business_id}", response_model=BusinessResponse)
+async def get_business(
+    business_id: str, business_crud: BusinessCRUD = Depends(get_business_crud)
+):
+    """Get business by ID"""
+    business = business_crud.get_by_id(business_id)
+    if not business:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Business with id {business_id} not found",
+        )
+    return business
+
 
 @router.put("/{business_id}", response_model=BusinessResponse)
 async def update_business(
@@ -77,6 +77,7 @@ async def update_business(
     """Update business by ID"""
     return business_crud.update(business_id, business_update, user_id=user_id)
 
+
 @router.delete("/{business_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_business(
     business_id: str,
@@ -85,6 +86,7 @@ async def delete_business(
 ):
     """Delete business by ID"""
     business_crud.delete(business_id, user_id)
+
 
 # @router.patch("/{business_id}/transfer", response_model=BusinessResponse)
 # async def transfer_business_ownership(

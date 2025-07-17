@@ -5,6 +5,7 @@ from app.database import create_db_and_tables
 
 from app.api.router import api_router
 from app.config import settings
+
 # from app.core.exceptions import setup_exception_handlers
 
 
@@ -20,7 +21,7 @@ app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
     description=settings.DESCRIPTION,
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 
@@ -38,6 +39,7 @@ app.add_middleware(
 
 # # Include routers
 app.include_router(api_router, prefix="/api")
+
 
 @app.get("/")
 async def root():
