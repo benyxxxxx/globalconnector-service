@@ -13,6 +13,7 @@ class BookingBase(BaseModel):
     service_snapshot: Dict[str, Any]
     scheduled_at: datetime
     total_price: Optional[float]
+    duration: Optional[int]
     status: BookingStatus = BookingStatus.PENDING
     attributes: Optional[Dict[str, Any]] = None
 
@@ -21,12 +22,16 @@ class BookingCreate(BaseModel):
     service_id: str
     variant_id: Optional[str] = None
     scheduled_at: datetime
+    duration: Optional[int]
     attributes: Optional[Dict[str, Any]] = None
+    force_add: Optional[bool] = None
 
 
 class BookingUpdate(BaseModel):
-    status: Optional[BookingStatus] = None
+    # status: Optional[BookingStatus] = None
     attributes: Optional[Dict[str, Any]] = None
+    duration: Optional[int] = None
+    scheduled_at: Optional[datetime] = None
 
 
 class BookingResponse(BookingBase):

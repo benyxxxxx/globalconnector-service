@@ -4,7 +4,7 @@ import pprint
 from datetime import datetime, timezone
 from typing import List, Optional, Any
 from sqlalchemy.orm import selectinload
-from sqlmodel import Session, select
+from sqlmodel import Session, select, and_
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 from app.models.booking import Booking
@@ -38,6 +38,39 @@ class BookingCRUD:
         if not service:
             raise ServiceNotFoundException(booking_in.service_id)
 
+        # Check for duplicate bookings by same user for overlapping scheduled time
+        existing_booking = self.session.exec(
+            select(Booking).where(
+                and_(
+                    Booking.user_id == self.current_user_id,
+                    Booking.service_id == booking_in.service_id,
+                    Booking.scheduled_at == booking_in.scheduled_at,
+                    Booking.status != "cancelled",  # exclude cancelled bookings
+                )
+            )
+        ).first()
+
+        if existing_booking and not booking_in.force_add:
+            raise HTTPException(
+                status_code=400,
+                detail="You already have a booking for this service at the scheduled time.",
+            )
+
+        pricing = service.pricing
+
+        # Validate and compute price
+        if pricing["type"] == "time_based":
+            if booking_in.duration is None:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Duration is required for time-based pricing.",
+                )
+            if pricing.get("base_price") is None or pricing.get("time_unit") is None:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Invalid time-based pricing configuration on service.",
+                )
+
         snapshot = jsonable_encoder(service)
 
         booking = Booking(
@@ -46,6 +79,7 @@ class BookingCRUD:
             user_id=self.current_user_id,
             variant_id=booking_in.variant_id,
             service_snapshot=snapshot,
+            duration=booking_in.duration,
             attributes=booking_in.attributes or {},
             scheduled_at=booking_in.scheduled_at,
             # total_price=service.pricing.base_price,  # Simplified, can be computed with variant/tier logic

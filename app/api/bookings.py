@@ -31,7 +31,7 @@ def get_booking(booking_id: str, booking_crud: BookingCRUD = Depends(get_booking
     return booking
 
 
-@router.put("/{booking_id}", response_model=BookingResponse)
+@router.patch("/{booking_id}", response_model=BookingResponse)
 def update_booking(
     booking_id: str,
     booking_in: BookingUpdate,
