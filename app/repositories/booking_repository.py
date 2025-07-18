@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from typing import List
 from sqlalchemy.orm import selectinload
 from sqlmodel import Session, select, and_
-from utils.ids import generate_unique_id
+from app.utils.ids import generate_unique_id
 from fastapi.encoders import jsonable_encoder
 from app.models.booking import Booking
 from app.schemas.booking import BookingCreate, BookingUpdate
