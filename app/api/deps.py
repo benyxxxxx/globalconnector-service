@@ -1,33 +1,27 @@
 from fastapi import Depends
 from sqlmodel import Session
 
-from app.services.business import (
-    BusinessCRUD,
-)  # or repositories.business if you renamed it
-from app.services.service import ServiceCRUD
-from app.services.booking import BookingCRUD
-from app.database import get_session  # adjust the import path based on your project
+from app.services.business_service import BusinessService
+from app.services.manage_service import ServiceManager
+from app.services.booking_service import BookingService
 
-from app.services.business import BusinessCRUD
-from app.auth import get_current_user_id
+from app.database import get_session
+from app.security import get_current_user_id
 
 
-def get_business_crud(
+def get_business_service(
     session: Session = Depends(get_session),
-    current_user_id: str = Depends(get_current_user_id),
-) -> BusinessCRUD:
-    return BusinessCRUD(session, current_user_id)
+) -> BusinessService:
+    return BusinessService(session)
 
 
-def get_service_crud(
+def get_service_manager(
     session: Session = Depends(get_session),
-    current_user_id: str = Depends(get_current_user_id),
-) -> ServiceCRUD:
-    return ServiceCRUD(session, current_user_id)
+) -> ServiceManager:
+    return ServiceManager(session)
 
 
-def get_booking_crud(
+def get_booking_service(
     session: Session = Depends(get_session),
-    current_user_id: str = Depends(get_current_user_id),
-) -> BookingCRUD:
-    return BookingCRUD(session, current_user_id)
+) -> BookingService:
+    return BookingService(session)

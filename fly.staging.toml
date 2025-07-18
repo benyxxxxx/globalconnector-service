@@ -4,7 +4,7 @@
 #
 
 app = 'global-connector-api-staging'
-primary_region = 'bom'
+primary_region = 'sin'
 
 [build]
 

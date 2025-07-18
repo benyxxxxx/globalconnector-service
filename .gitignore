@@ -5,6 +5,8 @@ venv
 *.pyo
 *.pyd
 .env
+.env.prod
+.env.dev
 .venv
 .vscode
 Pipfile.lock
