@@ -1,6 +1,7 @@
 # app/schemas/booking.py
 from datetime import datetime
 from typing import Optional, Dict, Any
+from decimal import Decimal
 from pydantic import BaseModel, ConfigDict
 from .service import ServiceResponse
 from app.models.booking import BookingStatus
@@ -12,7 +13,9 @@ class BookingBase(BaseModel):
     variant_id: Optional[str] = None
     service_snapshot: Dict[str, Any]
     scheduled_at: datetime
-    total_price: Optional[float]
+    total_price: Optional[Decimal]
+    base_price: Optional[Decimal]
+    currency: str
     duration: Optional[int]
     status: BookingStatus = BookingStatus.PENDING
     attributes: Optional[Dict[str, Any]] = None
