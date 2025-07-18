@@ -22,7 +22,7 @@ class BookingService:
     def get(self, booking_id: str, user_id: str) -> Booking:
         booking = self.repo.get(booking_id=booking_id)
         if not booking:
-            raise BookingNotFoundException()
+            raise BookingNotFoundException(booking_id)
 
         if booking.user_id != user_id:
             raise UnauthorizedBookingAccessException(booking_id=booking_id)
@@ -38,7 +38,7 @@ class BookingService:
         if not service:
             raise ServiceNotFoundException(booking_in.service_id)
 
-        if self.repo.check_booking_conflict(user_id=current_user_id):
+        if self.repo.check_booking_conflict(user_id=current_user_id, service_id=service.id, scheduled_at=booking_in.scheduled_at):
             raise BookingConflictException()
 
         pricing = service.pricing
@@ -46,9 +46,9 @@ class BookingService:
         # Validate and compute price
         if pricing["type"] == "time_based":
             if booking_in.duration is None:
-                raise BookingTimeBasedDurationRequiredException
+                raise BookingTimeBasedDurationRequiredException()
             if pricing.get("base_price") is None or pricing.get("time_unit") is None:
-                raise BookingInvalidTimeBasedConfigurationException
+                raise BookingInvalidTimeBasedConfigurationException()
 
         return self.repo.create(booking_in=booking_in, user_id=current_user_id)
 
@@ -56,6 +56,9 @@ class BookingService:
         self, booking_id: str, booking_in: BookingUpdate, current_user_id: str
     ) -> Booking:
         booking = self.repo.get(booking_id)
+
+        if not booking:
+            raise BookingNotFoundException(booking_id)
 
         if booking.user_id != current_user_id:
             raise UnauthorizedBookingAccessException(booking_id)

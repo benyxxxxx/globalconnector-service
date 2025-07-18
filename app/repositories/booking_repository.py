@@ -32,12 +32,13 @@ class BookingRepository:
         snapshot = jsonable_encoder(service_snapshot)
 
         booking_id = generate_unique_id()
+        booking_data = booking_in.model_dump()
 
         booking = Booking(
             id=booking_id,
             user_id=user_id,
             service_snapshot=snapshot,
-            **booking_in,
+            **booking_data,
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),
         )
