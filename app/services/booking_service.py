@@ -44,10 +44,10 @@ class BookingService:
         pricing = service.pricing
 
         # Validate and compute price
-        if pricing["type"] == "time_based":
+        if pricing.type == "time_based":
             if booking_in.duration is None:
                 raise BookingTimeBasedDurationRequiredException()
-            if pricing.get("base_price") is None or pricing.get("time_unit") is None:
+            if pricing.base_price is None or pricing.time_unit is None:
                 raise BookingInvalidTimeBasedConfigurationException()
 
         return self.repo.create(booking_in=booking_in, user_id=current_user_id)
