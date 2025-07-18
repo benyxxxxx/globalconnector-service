@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from typing import List, Optional, Dict, Any
 from enum import Enum
+from decimal import Decimal
 from sqlmodel import SQLModel, Field, Relationship, JSON, Column
 from pydantic import BaseModel, ConfigDict, model_validator
 
@@ -28,13 +29,13 @@ class VariantType(str, Enum):
 # Pydantic Models for JSON fields
 class PricingTier(BaseModel):
     duration: int
-    price: float
+    price: Optional[Decimal] = Field(default=None, decimal_places=2, max_digits=10)
 
 
 class Pricing(BaseModel):
     type: PricingType
     currency: str
-    base_price: float
+    base_price: Optional[Decimal] = Field(default=None, decimal_places=2, max_digits=10)
     time_unit: Optional[TimeUnit] = None
     tiers: Optional[List[PricingTier]] = None
     min_duration: Optional[int] = None
@@ -49,7 +50,7 @@ class Pricing(BaseModel):
 
 class VariantOption(BaseModel):
     name: str
-    price_change: float
+    price_change: Optional[Decimal] = Field(default=None, decimal_places=2, max_digits=10)
     available: bool = True
 
 
