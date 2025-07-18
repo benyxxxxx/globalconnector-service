@@ -1,8 +1,8 @@
-"""initial migration
+"""Initial commit
 
-Revision ID: 05a8c0440b13
+Revision ID: f3f99de4c701
 Revises:
-Create Date: 2025-07-17 22:40:34.057505
+Create Date: 2025-07-18 07:52:56.903374
 
 """
 
@@ -12,7 +12,7 @@ import sqlmodel
 
 
 # revision identifiers, used by Alembic.
-revision = "05a8c0440b13"
+revision = "f3f99de4c701"
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -87,8 +87,8 @@ def upgrade():
         sa.Column("variant_id", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
         sa.Column("offering_snapshot", sa.JSON(), nullable=False),
         sa.Column("attributes", sa.JSON(), nullable=True),
-        sa.Column("start_time", sa.DateTime(), nullable=False),
-        sa.Column("end_time", sa.DateTime(), nullable=True),
+        sa.Column("scheduled_at", sa.DateTime(), nullable=False),
+        sa.Column("duration", sa.Integer(), nullable=True),
         sa.Column("total_price", sa.Float(), nullable=True),
         sa.Column(
             "status",

@@ -21,13 +21,15 @@ class Booking(SQLModel, table=True):
     variant_id: Optional[str] = Field(default=None, index=True)
 
     # JSON fields
-    offering_snapshot: Dict[str, Any] = Field(sa_column=Column(JSON, nullable=False))
+    service_snapshot: Dict[str, Any] = Field(
+        sa_column=Column(JSON, nullable=False), default_factory=dict
+    )
     attributes: Optional[Dict[str, Any]] = Field(
         default_factory=dict, sa_column=Column(JSON)
     )
 
-    start_time: datetime
-    end_time: Optional[datetime] = Field(default=None)
+    scheduled_at: datetime
+    duration: Optional[int] = Field(default=None)
 
     total_price: Optional[float] = Field(default=None)
     status: BookingStatus = Field(default=BookingStatus.PENDING)

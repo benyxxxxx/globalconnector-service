@@ -6,8 +6,8 @@ from app.models.service import Service
 engine = create_engine(settings.DATABASE_URL, echo=True)
 
 
-def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
+# def create_db_and_tables():
+#     SQLModel.metadata.create_all(engine)
 
 
 def get_session():

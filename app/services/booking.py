@@ -3,6 +3,7 @@ from uuid import uuid4
 import pprint
 from datetime import datetime, timezone
 from typing import List, Optional, Any
+from sqlalchemy.orm import selectinload
 from sqlmodel import Session, select
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
@@ -19,7 +20,9 @@ class BookingCRUD:
 
     def get(self, booking_id: str) -> Booking:
         booking = self.session.exec(
-            select(Booking).where(Booking.id == booking_id)
+            select(Booking)
+            .where(Booking.id == booking_id)
+            .options(selectinload(Booking.service))
         ).first()
         if not booking:
             raise HTTPException(status_code=404, detail="Booking not found")
@@ -37,17 +40,14 @@ class BookingCRUD:
 
         snapshot = jsonable_encoder(service)
 
-        pprint.pprint(snapshot)
-
         booking = Booking(
             id=str(uuid4()),
             service_id=booking_in.service_id,
             user_id=self.current_user_id,
             variant_id=booking_in.variant_id,
-            # offering_snapshot=snapshot,
-            offering_snapshot={},
+            service_snapshot=snapshot,
             attributes=booking_in.attributes or {},
-            start_time=booking_in.start_time,
+            scheduled_at=booking_in.scheduled_at,
             # total_price=service.pricing.base_price,  # Simplified, can be computed with variant/tier logic
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),

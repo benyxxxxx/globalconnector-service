@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
-from app.database import create_db_and_tables
+
+# from contextlib import asynccontextmanager
+# from app.database import create_db_and_tables
 
 from app.api.router import api_router
 from app.config import settings
@@ -9,19 +10,19 @@ from app.config import settings
 # from app.core.exceptions import setup_exception_handlers
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup code
-    create_db_and_tables()
-    yield
-    # Shutdown code (if needed)
+# @asynccontextmanager
+# async def lifespan(app: FastAPI):
+#     # Startup code
+#     create_db_and_tables()
+#     yield
+#     # Shutdown code (if needed)
 
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
     description=settings.DESCRIPTION,
-    lifespan=lifespan,
+    # lifespan=lifespan,
 )
 
 
