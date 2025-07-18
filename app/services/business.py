@@ -18,11 +18,9 @@ class BusinessCRUD:
         self.session = session
         self.current_user_id = current_user_id
 
-
     def generate_business_id(self) -> str:
         """Generate a unique business ID"""
         return str(uuid.uuid4())
-
 
     def check_name_conflict(
         self, name: str, owner_id: str, exclude_id: Optional[str] = None
@@ -38,7 +36,6 @@ class BusinessCRUD:
         existing_business = self.session.exec(statement).first()
         return existing_business is not None
 
-
     def create(self, business_create: BusinessCreate) -> Business:
         """Create a new business"""
         business_id = self.generate_business_id()
@@ -50,7 +47,9 @@ class BusinessCRUD:
 
         # Check for name conflict within owner's businesses
         if self.check_name_conflict(business_create.name, self.current_user_id):
-            raise BusinessNameConflictException(business_create.name, self.current_user_id)
+            raise BusinessNameConflictException(
+                business_create.name, self.current_user_id
+            )
 
         # Create business
         business_data = business_create.model_dump()
@@ -62,12 +61,10 @@ class BusinessCRUD:
         self.session.refresh(business)
         return business
 
-
     def get_by_id(self, business_id: str) -> Optional[Business]:
         """Get business by ID"""
         statement = select(Business).where(Business.id == business_id)
         return self.session.exec(statement).first()
-
 
     def get_all(
         self, skip: int = 0, limit: int = 100, filters: Optional[BusinessFilter] = None
@@ -100,7 +97,6 @@ class BusinessCRUD:
         )
         return self.session.exec(statement).all()
 
-
     def get_by_owner_id(
         self, owner_id: str, skip: int = 0, limit: int = 100
     ) -> List[Business]:
@@ -113,7 +109,6 @@ class BusinessCRUD:
             .order_by(Business.created_at.desc())
         )
         return self.session.exec(statement).all()
-
 
     def get_by_type(
         self, business_type: BusinessType, skip: int = 0, limit: int = 100
@@ -154,8 +149,7 @@ class BusinessCRUD:
         )
         return self.session.exec(statement).all()
 
-    def update(
-        self, business_id: str, business_update: BusinessUpdate) -> Business:
+    def update(self, business_id: str, business_update: BusinessUpdate) -> Business:
         """Update business"""
         business = self.get_by_id(business_id)
         if not business:

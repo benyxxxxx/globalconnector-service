@@ -85,4 +85,3 @@ class Service(SQLModel, table=True):
 
     bookings: List["Booking"] = Relationship(back_populates="service")
     business: Optional["Business"] = Relationship(back_populates="services")
-

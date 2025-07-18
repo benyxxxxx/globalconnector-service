@@ -19,16 +19,13 @@ def list_services(
 
 
 @router.get("/my", response_model=List[ServiceResponse])
-async def get_owner_businesses(
-    service_crud: ServiceCRUD = Depends(get_service_crud)
-):
+async def get_owner_businesses(service_crud: ServiceCRUD = Depends(get_service_crud)):
     return service_crud.get_by_owner_id()
 
 
 @router.post("/", response_model=ServiceResponse, status_code=status.HTTP_201_CREATED)
 async def create_service(
-    service_in: ServiceCreate,
-    service_crud: ServiceCRUD = Depends(get_service_crud)
+    service_in: ServiceCreate, service_crud: ServiceCRUD = Depends(get_service_crud)
 ):
     service = service_crud.create(service_in)
     return service
@@ -36,8 +33,7 @@ async def create_service(
 
 @router.get("/{service_id}", response_model=ServiceResponse)
 def read_service(
-    service_id: str,
-    service_crud: ServiceCRUD = Depends(get_service_crud)
+    service_id: str, service_crud: ServiceCRUD = Depends(get_service_crud)
 ):
     service = service_crud.get(service_id)
     return service
@@ -47,7 +43,7 @@ def read_service(
 def update_service(
     service_id: str,
     service_in: ServiceUpdate,
-    service_crud: ServiceCRUD = Depends(get_service_crud)
+    service_crud: ServiceCRUD = Depends(get_service_crud),
 ):
     service = service_crud.update(service_id, service_in)
     return service
@@ -55,8 +51,7 @@ def update_service(
 
 @router.delete("/{service_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_service(
-    service_id: str,
-    service_crud: ServiceCRUD = Depends(get_service_crud)
+    service_id: str, service_crud: ServiceCRUD = Depends(get_service_crud)
 ):
     service_crud.delete(service_id)
     return None
@@ -64,8 +59,7 @@ def delete_service(
 
 @router.get("/business/{business_id}", response_model=List[ServiceResponse])
 def list_services_by_business(
-    business_id: str,
-    service_crud: ServiceCRUD = Depends(get_service_crud)
+    business_id: str, service_crud: ServiceCRUD = Depends(get_service_crud)
 ):
     services = service_crud.list_by_business(business_id)
     return services

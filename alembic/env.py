@@ -19,6 +19,7 @@ fileConfig(config.config_file_name)
 from app.models.business import Business
 from app.models.service import Service
 from app.models.booking import Booking
+
 # target_metadata = mymodel.Base.metadata
 target_metadata = sqlmodel.SQLModel.metadata
 
@@ -67,9 +68,7 @@ def run_migrations_online():
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

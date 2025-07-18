@@ -22,7 +22,9 @@ class Booking(SQLModel, table=True):
 
     # JSON fields
     offering_snapshot: Dict[str, Any] = Field(sa_column=Column(JSON, nullable=False))
-    attributes: Optional[Dict[str, Any]] = Field(default_factory=dict, sa_column=Column(JSON))
+    attributes: Optional[Dict[str, Any]] = Field(
+        default_factory=dict, sa_column=Column(JSON)
+    )
 
     start_time: datetime
     end_time: Optional[datetime] = Field(default=None)

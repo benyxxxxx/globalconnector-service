@@ -47,7 +47,9 @@ async def get_owner_businesses(
     business_crud: BusinessCRUD = Depends(get_business_crud),
 ):
     """Get businesses by owner ID"""
-    return business_crud.get_by_owner_id(business_crud.current_user_id, skip=skip, limit=limit)
+    return business_crud.get_by_owner_id(
+        business_crud.current_user_id, skip=skip, limit=limit
+    )
 
 
 @router.get("/{business_id}", response_model=BusinessResponse)
