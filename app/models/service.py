@@ -34,7 +34,7 @@ class PricingTier(BaseModel):
 
 class Pricing(BaseModel):
     type: PricingType
-    currency: str
+    currency: str = Field(default='USD')
     base_price: Optional[Decimal] = Field(default=None, decimal_places=2, max_digits=10)
     time_unit: Optional[TimeUnit] = None
     tiers: Optional[List[PricingTier]] = None

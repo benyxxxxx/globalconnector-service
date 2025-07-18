@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from decimal import Decimal
 from datetime import datetime, timezone
 from sqlmodel import SQLModel, Field, Column, JSON, Relationship
@@ -42,3 +42,4 @@ class Booking(SQLModel, table=True):
 
     # 👇 Relationship to Service
     service: Optional["Service"] = Relationship(back_populates="bookings")
+    payments: List["Payment"] = Relationship(back_populates="booking")
