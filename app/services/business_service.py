@@ -36,9 +36,11 @@ class BusinessService:
         """Get all businesses"""
         return self.repo.get_all()
 
+
     def get_by_owner_id(self, owner_id: str) -> List[Business]:
         """Get businesses by owner ID"""
         return self.repo.get_by_owner_id(owner_id=owner_id)
+
 
     def update(
         self, business_id: str, business_in: BusinessUpdate, current_user_id: str
@@ -53,6 +55,7 @@ class BusinessService:
             raise UnauthorizedBusinessAccessException(business_id)
 
         return self.repo.update(business_id=business_id, business_in=business_in)
+
 
     def delete(self, business_id: str, current_user_id: str) -> bool:
         """Delete business"""

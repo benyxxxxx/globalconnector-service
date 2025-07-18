@@ -14,6 +14,7 @@ class ServiceManager:
     def __init__(self, session: Session):
         self.repo = ServiceRepository(session)
 
+
     def get(self, service_id: str) -> Optional[Service]:
         service = self.repo.get(service_id)
 
@@ -22,14 +23,18 @@ class ServiceManager:
 
         return service
 
+
     def list(self) -> List[Service]:
         return self.repo.list()
+
 
     def list_by_business(self, business_id: str) -> List[Service]:
         return self.repo.list_by_business(business_id=business_id)
 
+
     def list_by_owner_id(self, owner_id: str) -> List[Service]:
         return self.repo.list_by_owner_id(owner_id=owner_id)
+
 
     def create(self, service_in: ServiceCreate, owner_id: str) -> Service:
         if self.repo.check_name_conflict(service_in.name, service_in.business_id):
@@ -37,10 +42,14 @@ class ServiceManager:
 
         return self.repo.create(service_in=service_in, owner_id=owner_id)
 
+
     def update(
         self, service_id: str, service_in: ServiceUpdate, current_user_id: str
     ) -> Service:
         service = self.repo.get(service_id)
+
+        if not service:
+            raise ServiceNotFoundException(service_id)
 
         if service.owner_id != current_user_id:
             raise UnauthorizedServiceAccessException(service_id)
@@ -49,6 +58,9 @@ class ServiceManager:
 
     def delete(self, service_id: str, current_user_id: str) -> None:
         service = self.repo.get(service_id)
+
+        if not service:
+            raise ServiceNotFoundException(service_id)
 
         if service.owner_id != current_user_id:
             raise UnauthorizedServiceAccessException(service_id)

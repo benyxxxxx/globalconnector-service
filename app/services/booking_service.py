@@ -68,6 +68,9 @@ class BookingService:
     def delete(self, booking_id: str, current_user_id: str) -> None:
         booking = self.repo.get(booking_id)
 
+        if not booking:
+            raise BookingNotFoundException(booking_id)
+
         if booking.user_id != current_user_id:
             raise UnauthorizedBookingAccessException(booking_id)
 
