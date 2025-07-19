@@ -97,7 +97,7 @@ class PaymentService:
 
         reference = generate_random_base58_key()
         payment_meta = self.get_payment_meta_for(payment_in.payment_method)
-        payment_meta["solana_pay_link"] = self.generate_solana_pay_url(10, reference)
+        payment_meta["solana_pay_link"] = self.generate_solana_pay_url(amount, reference)
 
         payment_data = PaymentCreate(
             amount=amount,
