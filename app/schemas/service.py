@@ -63,6 +63,7 @@ class ServiceUpdate(BaseModel):
 class ServiceResponse(ServiceBase):
     # model_config = ConfigDict(from_attributes=True)
     id: str
+    owner_id: str
     # business_id: str
     created_at: datetime
     updated_at: datetime
