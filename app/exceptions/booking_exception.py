@@ -47,3 +47,11 @@ class BookingInvalidTimeBasedConfigurationException(HTTPException):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid time-based pricing configuration on service.",
         )
+
+
+class BookingInvalidDurationException(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Booking duration must be a positive number for time-based pricing.",
+        )

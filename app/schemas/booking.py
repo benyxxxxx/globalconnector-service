@@ -10,7 +10,7 @@ from app.models.booking import BookingStatus
 class BookingBase(BaseModel):
     service_id: str
     user_id: str
-    variant_id: Optional[str] = None
+    # variant_id: Optional[str] = None
     service_snapshot: Dict[str, Any]
     scheduled_at: datetime
     total_price: Optional[Decimal]
@@ -22,7 +22,7 @@ class BookingBase(BaseModel):
 
 class BookingCreate(BaseModel):
     service_id: str
-    variant_id: Optional[str] = None
+    # variant_id: Optional[str] = None
     scheduled_at: datetime
     duration: Optional[int]
     attributes: Optional[Dict[str, Any]] = None
