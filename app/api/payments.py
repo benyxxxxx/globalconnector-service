@@ -39,7 +39,7 @@ def create_payment(
     response_model=PaymentResponse,
     status_code=status.HTTP_200_OK,
 )
-def create_payment(
+def get_payment(
     payment_id: str,
     payment_service: PaymentService = Depends(get_payment_service),
     current_user_id: str = Depends(get_current_user_id)
