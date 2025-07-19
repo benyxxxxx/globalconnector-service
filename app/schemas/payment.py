@@ -3,7 +3,7 @@ from typing import Optional, Dict, Any
 from enum import Enum
 from decimal import Decimal
 from datetime import datetime
-from app.models.payment import PaymentStatus, PaymentMethod
+from app.models.payment import PaymentStatus, PaymentMethod, PaymentProvider
 
 
 # -----------------------------
@@ -15,10 +15,10 @@ class PaymentBase(PydanticBaseModel):
     status: PaymentStatus = PaymentStatus.PENDING
     amount: Decimal
     currency: str = "USD"
-    method: PaymentMethod = PaymentMethod.CARD
+    payment_method: PaymentMethod = PaymentMethod.CARD
     external_id: Optional[str] = None
     transaction_id: Optional[str] = None
-    provider: str = ""
+    provider: PaymentProvider = ""
     paid_at: Optional[datetime] = None
     payment_metadata: Dict[str, Any] = {}
 
@@ -29,8 +29,20 @@ class PaymentBase(PydanticBaseModel):
 # -----------------------------
 # Create schema
 # -----------------------------
+class PaymentRequest(PydanticBaseModel):
+    payment_method: PaymentMethod
+    force_add: Optional[bool] = False
+
+
 class PaymentCreate(PydanticBaseModel):
-    method: PaymentMethod = PaymentMethod.CARD
+    status: PaymentStatus = PaymentStatus.PENDING
+    amount: Decimal
+    currency: str = "USD"
+    payment_method: PaymentMethod = PaymentMethod.CARD
+    external_id: Optional[str] = None
+    transaction_id: Optional[str] = None
+    provider: PaymentProvider = ""
+    payment_metadata: Dict[str, Any] = {}
 
 
 # -----------------------------
@@ -38,7 +50,7 @@ class PaymentCreate(PydanticBaseModel):
 # -----------------------------
 class PaymentUpdate(PydanticBaseModel):
     status: Optional[PaymentStatus] = None
-    method: Optional[PaymentMethod] = None
+    payment_method: Optional[PaymentMethod] = None
     external_id: Optional[str] = None
     transaction_id: Optional[str] = None
     paid_at: Optional[datetime] = None
@@ -51,7 +63,7 @@ class PaymentUpdate(PydanticBaseModel):
 # -----------------------------
 # Read schema (e.g. for GET response)
 # -----------------------------
-class PaymentRead(PaymentBase):
+class PaymentResponse(PaymentBase):
     id: str
     created_at: datetime
     updated_at: datetime

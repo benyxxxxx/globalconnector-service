@@ -16,6 +16,9 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env")
 
+    SOLANA_DESTINATION_ADDRESS: str
+    MANDEL_COIN_MINT_ADDRESS: str
+
     @field_validator("DATABASE_URL", "SECRET_KEY")
     @classmethod
     def must_not_be_empty(cls, v, info):

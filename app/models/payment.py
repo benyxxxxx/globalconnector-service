@@ -20,6 +20,10 @@ class PaymentMethod(str, Enum):
     MANDEL_COIN = "mandel_coin"
 
 
+class PaymentProvider(str, Enum):
+    SOLANA = "solana"
+
+
 class Payment(SQLModel, table=True):
     __tablename__ = "payments"
 
@@ -35,7 +39,7 @@ class Payment(SQLModel, table=True):
     )
     currency: str = Field(default="USD")
 
-    method: PaymentMethod = Field(default=PaymentMethod.CARD)
+    payment_method: PaymentMethod = Field(default=PaymentMethod.CARD)
 
     external_id: Optional[str] = Field(
         default=None, index=True
