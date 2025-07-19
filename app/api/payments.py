@@ -31,3 +31,17 @@ def create_payment(
     current_user_id: str = Depends(get_current_user_id)
 ):
     return payment_service.create_payment(payment_in=payment_in, user_id=current_user_id)
+
+
+
+@router.get(
+    "/{payment_id}",
+    response_model=PaymentResponse,
+    status_code=status.HTTP_200_OK,
+)
+def create_payment(
+    payment_id: str,
+    payment_service: PaymentService = Depends(get_payment_service),
+    current_user_id: str = Depends(get_current_user_id)
+):
+    return payment_service.get(payment_id)
