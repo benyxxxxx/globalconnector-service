@@ -1,8 +1,8 @@
-"""Update payment model
+"""Remove business
 
-Revision ID: b80f2b556b86
-Revises: 84be562a014b
-Create Date: 2025-07-18 15:35:00.389470
+Revision ID: 7e9cd16e3009
+Revises: 23c05e945670
+Create Date: 2025-07-19 08:16:25.463905
 
 """
 
@@ -11,8 +11,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = "b80f2b556b86"
-down_revision = "84be562a014b"
+revision = "7e9cd16e3009"
+down_revision = "23c05e945670"
 branch_labels = None
 depends_on = None
 

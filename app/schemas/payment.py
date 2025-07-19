@@ -47,7 +47,6 @@ class PaymentUpdate(PydanticBaseModel):
         orm_mode = True
 
 
-
 # -----------------------------
 # Read schema (e.g. for GET response)
 # -----------------------------

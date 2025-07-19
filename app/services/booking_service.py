@@ -38,7 +38,11 @@ class BookingService:
         if not service:
             raise ServiceNotFoundException(booking_in.service_id)
 
-        if self.repo.check_booking_conflict(user_id=current_user_id, service_id=service.id, scheduled_at=booking_in.scheduled_at):
+        if self.repo.check_booking_conflict(
+            user_id=current_user_id,
+            service_id=service.id,
+            scheduled_at=booking_in.scheduled_at,
+        ):
             raise BookingConflictException()
 
         pricing_model = service.pricing_model

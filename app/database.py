@@ -1,6 +1,7 @@
 from sqlmodel import SQLModel, create_engine, Session
 from app.config import settings
-from app.models.business import Business
+
+# from app.models.business import Business
 from app.models.service import Service
 
 engine = create_engine(settings.DATABASE_URL, echo=True)

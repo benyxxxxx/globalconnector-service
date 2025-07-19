@@ -42,7 +42,7 @@ def read_service(
     return service
 
 
-@router.put("/{service_id}", response_model=ServiceResponse)
+@router.patch("/{service_id}", response_model=ServiceResponse)
 def update_service(
     service_id: str,
     service_in: ServiceUpdate,

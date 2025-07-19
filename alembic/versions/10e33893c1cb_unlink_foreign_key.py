@@ -1,8 +1,8 @@
-"""Update payment model
+"""unlink foreign key
 
-Revision ID: b80f2b556b86
-Revises: 84be562a014b
-Create Date: 2025-07-18 15:35:00.389470
+Revision ID: 10e33893c1cb
+Revises: 7e9cd16e3009
+Create Date: 2025-07-19 08:17:49.521235
 
 """
 
@@ -11,8 +11,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = "b80f2b556b86"
-down_revision = "84be562a014b"
+revision = "10e33893c1cb"
+down_revision = "7e9cd16e3009"
 branch_labels = None
 depends_on = None
 

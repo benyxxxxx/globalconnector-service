@@ -19,9 +19,9 @@ class ServiceRepository:
         statement = select(Service)
         return self.session.exec(statement).all()
 
-    def list_by_business(self, business_id: str) -> List[Service]:
-        statement = select(Service).where(Service.business_id == business_id)
-        return self.session.exec(statement).all()
+    # def list_by_business(self, business_id: str) -> List[Service]:
+    #     statement = select(Service).where(Service.business_id == business_id)
+    #     return self.session.exec(statement).all()
 
     def list_by_owner_id(self, owner_id: str) -> List[Service]:
         """List service by owner ID"""
@@ -33,11 +33,21 @@ class ServiceRepository:
         )
         return self.session.exec(statement).all()
 
-    def check_name_conflict(self, name: str, business_id: str) -> bool:
+    def check_name_conflict(
+        self, name: str, owner_id: str, business_id: str = ""
+    ) -> bool:
         """Check if service name already exists for the business"""
-        statement = select(Service).where(
-            and_(Service.name == name, Service.business_id == business_id)
-        )
+        statement = select(Service)
+
+        # if business_id:
+        #     statement = statement.where(
+        #     and_(Service.name == name, Service.business_id == business_id)
+        # )
+
+        if owner_id:
+            statement = statement.where(
+                and_(Service.name == name, Service.owner_id == owner_id)
+            )
 
         existing_service = self.session.exec(statement).first()
         return existing_service is not None
@@ -45,7 +55,7 @@ class ServiceRepository:
     def create(self, service_in: ServiceCreate, owner_id: str) -> Service:
 
         service_id = generate_unique_id()
-        service_data = service_in.model_dump()
+        service_data = service_in.model_dump(mode="json")
 
         service = Service(
             id=service_id,
@@ -63,7 +73,9 @@ class ServiceRepository:
     def update(self, service_id: str, service_in: ServiceUpdate) -> Service:
         service = self.get(service_id)
 
-        for field, value in service_in.model_dump(exclude_unset=True).items():
+        for field, value in service_in.model_dump(
+            exclude_unset=True, mode="json"
+        ).items():
             if field == "attributes":
                 setattr(service, "attributes", value)
             else:

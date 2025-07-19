@@ -8,10 +8,10 @@ from app.models.service import Variant, PricingTier, PricingType, TimeUnit
 class ServiceBase(BaseModel):
     name: str
     description: Optional[str] = None
-    business_id: str
+    # business_id: str
 
-    pricing_model: PricingType 
-    currency: str = 'USD'
+    pricing_model: PricingType
+    currency: str = "USD"
     base_price: Decimal
 
     time_unit: Optional[TimeUnit] = None
@@ -28,9 +28,9 @@ class ServiceBase(BaseModel):
 class ServiceCreate(BaseModel):
     name: str
     description: Optional[str] = None
-    business_id: str
+    # business_id: str
 
-    pricing_model: PricingType 
+    pricing_model: PricingType
     currency: str
     base_price: Decimal
 
@@ -47,9 +47,9 @@ class ServiceCreate(BaseModel):
 class ServiceUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
-    pricing_model: PricingType 
-    currency: str
-    base_price: Decimal
+    pricing_model: Optional[PricingType] = None
+    currency: Optional[str] = None
+    base_price: Optional[Decimal] = None
 
     time_unit: Optional[TimeUnit] = None
     min_duration: Optional[int] = None
@@ -63,6 +63,6 @@ class ServiceUpdate(BaseModel):
 class ServiceResponse(ServiceBase):
     # model_config = ConfigDict(from_attributes=True)
     id: str
-    business_id: str
+    # business_id: str
     created_at: datetime
     updated_at: datetime
