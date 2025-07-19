@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from app.api import businesses, services, bookings
+from app.models.payment import Payment
 
 api_router = APIRouter()
 api_router.include_router(businesses.router, prefix="/businesses", tags=["businesses"])

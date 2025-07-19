@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from typing import List, Optional, Dict, Any
 from enum import Enum
 from decimal import Decimal
-from sqlmodel import SQLModel, Field, Relationship, JSON, Column
+from sqlmodel import SQLModel, Field, Relationship, JSON, Column, Enum as SqlEnum, DECIMAL
 from pydantic import BaseModel, ConfigDict, model_validator
 
 
@@ -31,15 +31,6 @@ class PricingTier(BaseModel):
     duration: int
     price: Optional[Decimal] = Field(default=None, decimal_places=2, max_digits=10)
 
-
-class Pricing(BaseModel):
-    type: PricingType
-    currency: str = Field(default='USD')
-    base_price: Optional[Decimal] = Field(default=None, decimal_places=2, max_digits=10)
-    time_unit: Optional[TimeUnit] = None
-    tiers: Optional[List[PricingTier]] = None
-    min_duration: Optional[int] = None
-    max_duration: Optional[int] = None
 
     # @model_validator(mode="after")
     # def validate_time_unit_required(self) -> 'Pricing':
@@ -72,10 +63,16 @@ class Service(SQLModel, table=True):
     business_id: str = Field(foreign_key="businesses.id", index=True)
     owner_id: str = Field(index=True)
 
-    # JSON field for pricing
-    pricing: Pricing = Field(sa_column=Column(JSON))
+    pricing_model: Optional[str] = Field(default='')
+    currency: Optional[str] = Field(default='')
+    base_price: Optional[Decimal] = Field(default=None, sa_column=Column(DECIMAL(10, 2)))
 
-    # JSON field for variants
+    time_unit: Optional[str] = Field(default=None)
+
+    min_duration: Optional[int] = Field(default=None)
+    max_duration: Optional[int] = Field(default=None)
+
+    pricing_tiers: Optional[List[PricingTier]] = Field(default=None, sa_column=Column(JSON))
     variants: Optional[List[Variant]] = Field(default=None, sa_column=Column(JSON))
 
     # JSON field for flexible

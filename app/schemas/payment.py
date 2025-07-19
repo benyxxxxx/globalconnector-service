@@ -28,8 +28,8 @@ class PaymentBase(PydanticBaseModel):
 # -----------------------------
 # Create schema
 # -----------------------------
-class PaymentCreate(PaymentBase):
-    pass
+class PaymentCreate(PydanticBaseModel):
+    method: PaymentMethod = PaymentMethod.CARD
 
 
 # -----------------------------

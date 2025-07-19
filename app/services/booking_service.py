@@ -41,13 +41,15 @@ class BookingService:
         if self.repo.check_booking_conflict(user_id=current_user_id, service_id=service.id, scheduled_at=booking_in.scheduled_at):
             raise BookingConflictException()
 
-        pricing = service.pricing
+        pricing_model = service.pricing_model
+        base_price = service.base_price
+        time_unit = service.time_unit
 
         # Validate and compute price
-        if pricing.type == "time_based":
+        if pricing_model == "time_based":
             if booking_in.duration is None:
                 raise BookingTimeBasedDurationRequiredException()
-            if pricing.base_price is None or pricing.time_unit is None:
+            if base_price is None or time_unit is None:
                 raise BookingInvalidTimeBasedConfigurationException()
 
         return self.repo.create(booking_in=booking_in, user_id=current_user_id)
