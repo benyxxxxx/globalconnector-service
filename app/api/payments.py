@@ -16,8 +16,9 @@ def get_payments(
     booking_id: Optional[str] = Query(default=None),
     reference_id: Optional[str] = Query(default=None),
     payment_service: PaymentService = Depends(get_payment_service),
+    current_user_id : str = Depends(get_current_user_id)
 ):
-    return payment_service.list_payments(booking_id=booking_id, reference_id=reference_id)
+    return payment_service.list_payments(booking_id=booking_id, reference_id=reference_id, user_id=current_user_id)
 
 
 @router.post(

@@ -20,8 +20,13 @@ class PaymentRepository:
         self,
         booking_id: Optional[str] = None,
         reference_id: Optional[str] = None,
+        user_id: Optional[str] = None
     ) -> List[Payment]:
+
         statement = select(Payment)
+
+        if user_id:
+            statement = statement.where(Payment.user_id == user_id)
 
         if booking_id:
             statement = statement.where(Payment.booking_id == booking_id)
@@ -30,9 +35,6 @@ class PaymentRepository:
             statement = statement.where(
                 (Payment.reference_id == reference_id) 
             )
-        else:
-            # Optional: raise error or return empty list
-            return []
 
         statement = statement.order_by(Payment.created_at.desc())
         return self.session.exec(statement).all()
@@ -58,8 +60,14 @@ class PaymentRepository:
     def update(self, payment_id: str, payment_in: PaymentUpdate) -> Payment:
         payment = self.get(payment_id)
 
-        for key, value in payment_in.model_dump(exclude_unset=True).items():
-            setattr(payment, key, value)
+
+        for field, value in payment_in.model_dump(
+            exclude_unset=True, mode="json"
+        ).items():
+            if field == "payment_metadata":
+                setattr(payment, "payment_metadata", value)
+            else:
+                setattr(payment, field, value)
 
         payment.updated_at = datetime.now(timezone.utc)
         self.session.add(payment)

@@ -10,6 +10,7 @@ from app.schemas.payment import (
     PaymentCreate,
     PaymentBase,
     PaymentRequest,
+    PaymentUpdate,
     PaymentStatus,
     PaymentMethod,
 )
@@ -19,6 +20,7 @@ from app.exceptions.payment_exceptions import (
     PaymentNotFoundException,
     UnauthorizedPaymentAccessException,
 )
+from app.services.solana_service import verify_payment
 from app.models.payment import Payment, PaymentProvider
 
 
@@ -28,7 +30,38 @@ class PaymentService:
         self.booking_repo = BookingRepository(session)
         self.service_repo = ServiceRepository(session)
 
+
+    def verify_payment_status(self, payment_id: str):
+        payment_data = self.repo.get(payment_id=payment_id)
+
+        ref = payment_data.external_id
+
+        status = False
+        signature = ''
+
+        try:
+            status, signature = verify_payment(
+                reference_key=ref, expected_amount=payment_data.amount, token_mint=settings.MANDEL_COIN_MINT_ADDRESS)
+        except Exception as e:
+            raise Exception(e)
+
+        if status:
+            payment_data.status = PaymentStatus.SUCCEEDED
+
+            meta = payment_data.payment_metadata or {}
+            meta['signature'] = signature
+
+            self.repo.update(
+                payment_id=payment_id,
+                payment_in=PaymentUpdate(
+                    status=payment_data.status,
+                    payment_metadata=meta
+                )
+            )
+
+        
     def get(self, payment_id: str) -> Payment:
+        self.verify_payment_status(payment_id)
         payment_data = self.repo.get(payment_id=payment_id)
 
         if not payment_data:
@@ -40,8 +73,9 @@ class PaymentService:
         self,
         booking_id: Optional[str] = None,
         reference_id: Optional[str] = None,
+        user_id: Optional[str] = None
     ) -> List[Payment]:
-        return self.repo.list_payments(booking_id, reference_id)
+        return self.repo.list_payments(user_id=user_id, booking_id=booking_id, reference_id=reference_id)
 
     def get_payment_provider(self, method: PaymentMethod):
         if method == PaymentMethod.MANDEL_COIN:
@@ -114,12 +148,14 @@ class PaymentService:
             currency = "USD"  # or pass currency in PaymentRequest if needed
 
         else:
-            raise ValueError("Either booking_id or (reference_id and reference_type) must be provided.")
+            raise ValueError(
+                "Either booking_id or (reference_id and reference_type) must be provided.")
 
         # Create payment meta
         reference = generate_random_base58_key()
         payment_meta = self.get_payment_meta_for(payment_in.payment_method)
-        payment_meta["solana_pay_link"] = self.generate_solana_pay_url(amount, reference)
+        payment_meta["solana_pay_link"] = self.generate_solana_pay_url(
+            amount, reference)
 
         # Build payment data
         payment_data = PaymentCreate(
@@ -138,7 +174,7 @@ class PaymentService:
         # Save payment
         payment_created = self.repo.create(
             payment_in=payment_data,
-            booking_id=payment_in.booking_id, # Optional,
+            booking_id=payment_in.booking_id,  # Optional,
             user_id=user_id
         )
 
