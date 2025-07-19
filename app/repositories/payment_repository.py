@@ -1,19 +1,11 @@
 from datetime import datetime, timezone
 from typing import List
-from sqlalchemy.orm import selectinload
-from decimal import Decimal
-from sqlmodel import Session, select, and_
+from sqlmodel import Session, select
 from app.utils.ids import generate_unique_id
-from fastapi.encoders import jsonable_encoder
 from app.schemas.payment import (
-    PaymentCreate,
-    PaymentStatus,
-    PaymentMethod,
     PaymentBase,
     PaymentUpdate,
 )
-from app.schemas.booking import BookingCreate, BookingUpdate
-from app.models.service import Service
 from app.models.payment import Payment
 
 
@@ -48,8 +40,8 @@ class PaymentRepository:
         self.session.refresh(payment)
         return payment
 
-    def update(self, booking_id: str, payment_in: PaymentUpdate) -> Payment:
-        payment = self.get(booking_id)
+    def update(self, payment_id: str, payment_in: PaymentUpdate) -> Payment:
+        payment = self.get(payment_id)
 
         for key, value in payment_in.model_dump(exclude_unset=True).items():
             setattr(payment, key, value)
