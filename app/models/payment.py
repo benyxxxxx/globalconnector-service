@@ -3,7 +3,7 @@ from typing import Optional, Dict, Any
 from decimal import Decimal
 from datetime import datetime, timezone
 from app.utils.ids import generate_unique_id
-from sqlmodel import SQLModel, Field, Column, JSON, Relationship
+from sqlmodel import SQLModel, Field, Column, JSON, Relationship, DECIMAL
 
 
 class PaymentStatus(str, Enum):
@@ -30,7 +30,9 @@ class Payment(SQLModel, table=True):
 
     status: PaymentStatus = Field(default=PaymentStatus.PENDING, index=True)
 
-    amount: Decimal = Field(decimal_places=2, max_digits=10)
+    amount: Decimal = Field(
+        decimal_places=2, max_digits=10, sa_column=Column(DECIMAL(10, 2))
+    )
     currency: str = Field(default="USD")
 
     method: PaymentMethod = Field(default=PaymentMethod.CARD)

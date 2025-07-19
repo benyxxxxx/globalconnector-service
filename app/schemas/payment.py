@@ -10,6 +10,7 @@ from app.models.payment import PaymentStatus, PaymentMethod
 # Shared base schema
 # -----------------------------
 class PaymentBase(PydanticBaseModel):
+    id: str
     booking_id: str
     status: PaymentStatus = PaymentStatus.PENDING
     amount: Decimal
