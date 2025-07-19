@@ -102,7 +102,7 @@ class PaymentService:
         payment_data = PaymentCreate(
             amount=amount,
             status=PaymentStatus.PENDING,
-            currency=booking.currency,
+            currency=booking.service.currency,
             transaction_id="",
             external_id=reference,
             payment_method=payment_in.payment_method,
