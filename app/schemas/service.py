@@ -18,8 +18,8 @@ class ServiceBase(BaseModel):
     min_duration: Optional[int] = None
     max_duration: Optional[int] = None
 
-    pricing_tiers: Optional[List[PricingTier]] = None
-    variants: Optional[List[Variant]] = None
+    # pricing_tiers: Optional[List[PricingTier]] = None
+    # variants: Optional[List[Variant]] = None
 
     attributes: Optional[Dict[str, Any]] = None
 
@@ -38,8 +38,8 @@ class ServiceCreate(BaseModel):
     min_duration: Optional[int] = None
     max_duration: Optional[int] = None
 
-    pricing_tiers: Optional[List[PricingTier]] = None
-    variants: Optional[List[Variant]] = None
+    # pricing_tiers: Optional[List[PricingTier]] = None
+    # variants: Optional[List[Variant]] = None
 
     attributes: Optional[Dict[str, Any]] = None
 
@@ -56,8 +56,8 @@ class ServiceUpdate(BaseModel):
     max_duration: Optional[int] = None
 
     pricing_tiers: Optional[List[PricingTier]] = None
-    variants: Optional[List[Variant]] = None
-    attributes: Optional[Dict[str, Any]] = None
+    # variants: Optional[List[Variant]] = None
+    # attributes: Optional[Dict[str, Any]] = None
 
 
 class ServiceResponse(ServiceBase):
