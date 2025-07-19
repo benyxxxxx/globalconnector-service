@@ -30,7 +30,11 @@ class Payment(SQLModel, table=True):
     id: str = Field(
         default_factory=lambda: generate_unique_id(), primary_key=True, index=True
     )
-    booking_id: str = Field(foreign_key="bookings.id", index=True)
+    user_id: Optional[str] = Field(default=None)
+    booking_id: Optional[str] = Field(default=None, foreign_key="bookings.id", index=True)
+
+    reference_type: Optional[str] = Field(default=None, index=True)  
+    reference_id: Optional[str] = Field(default=None, index=True)    
 
     status: PaymentStatus = Field(default=PaymentStatus.PENDING, index=True)
 

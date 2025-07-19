@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import List
+from typing import List, Optional
 from sqlmodel import Session, select
 from app.utils.ids import generate_unique_id
 from app.schemas.payment import PaymentBase, PaymentUpdate, PaymentCreate
@@ -16,20 +16,34 @@ class PaymentRepository:
         payment = self.session.exec(statement).first()
         return payment
 
-    def list_by_booking(self, booking_id: str) -> List[Payment]:
-        statement = (
-            select(Payment)
-            .where(Payment.booking_id == booking_id)
-            .order_by(Payment.created_at.desc())
-        )
+    def list_payments(
+        self,
+        booking_id: Optional[str] = None,
+        reference_id: Optional[str] = None,
+    ) -> List[Payment]:
+        statement = select(Payment)
+
+        if booking_id:
+            statement = statement.where(Payment.booking_id == booking_id)
+
+        elif reference_id:
+            statement = statement.where(
+                (Payment.reference_id == reference_id) 
+            )
+        else:
+            # Optional: raise error or return empty list
+            return []
+
+        statement = statement.order_by(Payment.created_at.desc())
         return self.session.exec(statement).all()
 
-    def create(self, payment_in: PaymentCreate, booking_id: str) -> Payment:
+    def create(self, payment_in: PaymentCreate, booking_id: str, user_id: str) -> Payment:
 
         payment_id = generate_unique_id()
 
         payment = Payment(
             id=payment_id,
+            user_id=user_id,
             booking_id=booking_id,
             **payment_in.model_dump(),
             created_at=datetime.now(timezone.utc),

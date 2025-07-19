@@ -1,4 +1,4 @@
-from pydantic import BaseModel as PydanticBaseModel
+from pydantic import BaseModel as PydanticBaseModel, model_validator
 from typing import Optional, Dict, Any
 from enum import Enum
 from decimal import Decimal
@@ -11,7 +11,10 @@ from app.models.payment import PaymentStatus, PaymentMethod, PaymentProvider
 # -----------------------------
 class PaymentBase(PydanticBaseModel):
     id: str
-    booking_id: str
+    user_id: Optional[str]
+    reference_type: Optional[str] 
+    reference_id: Optional[str] 
+    booking_id: Optional[str]
     status: PaymentStatus = PaymentStatus.PENDING
     amount: Decimal
     currency: str = "USD"
@@ -30,12 +33,29 @@ class PaymentBase(PydanticBaseModel):
 # Create schema
 # -----------------------------
 class PaymentRequest(PydanticBaseModel):
+    booking_id: Optional[str] = None
+    reference_type: Optional[str] = None
+    reference_id: Optional[str] = None
+    amount: Decimal = None
     payment_method: PaymentMethod
     force_add: Optional[bool] = False
+
+    @model_validator(mode="after")
+    def validate_reference_or_booking(self) -> "PaymentRequest":
+        if not self.booking_id and not self.reference_id:
+            raise ValueError("Either 'booking_id' or 'reference_id' must be provided.")
+
+        if self.reference_id and not self.amount:
+            raise ValueError("'amount' is required when 'reference_id' is provided.")
+
+
+        return self
 
 
 class PaymentCreate(PydanticBaseModel):
     status: PaymentStatus = PaymentStatus.PENDING
+    reference_type: Optional[str] = None
+    reference_id: Optional[str]  = None
     amount: Decimal
     currency: str = "USD"
     payment_method: PaymentMethod = PaymentMethod.CARD
