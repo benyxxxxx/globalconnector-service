@@ -1,7 +1,7 @@
 from typing import List
 from sqlmodel import Session
 from app.models.booking import Booking
-from app.schemas.booking import BookingCreate, BookingUpdate
+from app.schemas.booking import BookingCreate, BookingUpdate, BookingCreateValidated
 from app.exceptions.booking_exception import (
     BookingNotFoundException,
     BookingConflictException,
@@ -55,8 +55,10 @@ class BookingService:
                 raise BookingTimeBasedDurationRequiredException()
             if base_price is None or time_unit is None:
                 raise BookingInvalidTimeBasedConfigurationException()
+        
+        booking_in_validated = BookingCreateValidated(base_price=service.base_price, total_price=service.base_price, **booking_in.model_dump())
 
-        return self.repo.create(booking_in=booking_in, user_id=current_user_id)
+        return self.repo.create(booking_in=booking_in_validated, user_id=current_user_id)
 
     def update(
         self, booking_id: str, booking_in: BookingUpdate, current_user_id: str

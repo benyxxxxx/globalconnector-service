@@ -5,7 +5,7 @@ from sqlmodel import Session, select, and_
 from app.utils.ids import generate_unique_id
 from fastapi.encoders import jsonable_encoder
 from app.models.booking import Booking
-from app.schemas.booking import BookingCreate, BookingUpdate
+from app.schemas.booking import BookingCreate, BookingUpdate, BookingCreateValidated
 from app.models.service import Service
 
 
@@ -26,7 +26,7 @@ class BookingRepository:
         statement = select(Booking).where(Booking.user_id == user_id)
         return self.session.exec(statement).all()
 
-    def create(self, booking_in: BookingCreate, user_id: str) -> Booking:
+    def create(self, booking_in: BookingCreateValidated, user_id: str) -> Booking:
 
         service_snapshot = self.session.get(Service, booking_in.service_id)
         snapshot = jsonable_encoder(service_snapshot)

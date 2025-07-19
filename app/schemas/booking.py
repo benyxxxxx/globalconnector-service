@@ -15,7 +15,6 @@ class BookingBase(BaseModel):
     scheduled_at: datetime
     total_price: Optional[Decimal]
     base_price: Optional[Decimal]
-    currency: str
     duration: Optional[int]
     status: BookingStatus = BookingStatus.PENDING
     attributes: Optional[Dict[str, Any]] = None
@@ -29,6 +28,10 @@ class BookingCreate(BaseModel):
     attributes: Optional[Dict[str, Any]] = None
     force_add: Optional[bool] = None
 
+
+class BookingCreateValidated(BookingCreate):
+    total_price: Optional[Decimal]
+    base_price: Optional[Decimal]
 
 class BookingUpdate(BaseModel):
     # status: Optional[BookingStatus] = None

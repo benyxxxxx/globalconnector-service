@@ -37,7 +37,6 @@ class Booking(SQLModel, table=True):
     total_price: Optional[Decimal] = Field(
         default=None, decimal_places=2, max_digits=10
     )
-    currency: str = Field(default="USD")
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
