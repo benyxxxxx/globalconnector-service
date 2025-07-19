@@ -38,7 +38,7 @@ class PaymentRequest(PydanticBaseModel):
     reference_id: Optional[str] = None
     amount: Decimal = None
     payment_method: PaymentMethod
-    force_add: Optional[bool] = False
+    # force_add: Optional[bool] = False
 
     @model_validator(mode="after")
     def validate_reference_or_booking(self) -> "PaymentRequest":
