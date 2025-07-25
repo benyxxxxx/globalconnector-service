@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for global-connector-api on 2025-07-17T21:05:18+05:45
+# fly.toml app configuration file generated for global-connector-service on 2025-07-25T12:57:00+05:45
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'global-connector-api'
+app = 'global-connector-service'
 primary_region = 'sin'
 
 [build]
