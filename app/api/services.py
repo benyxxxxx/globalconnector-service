@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends, status
-from typing import List
+from fastapi import APIRouter, Depends, status, Query
+from typing import List, Optional
 from app.schemas.service import ServiceResponse, ServiceCreate, ServiceUpdate
 from app.services.manage_service import ServiceManager
 from app.security import get_current_user_id
@@ -11,9 +11,10 @@ router = APIRouter(dependencies=[Depends(get_current_user_id)])
 
 @router.get("/", response_model=List[ServiceResponse])
 def list_services(
+    q: Optional[str] = Query(default=None, description="Search by name or description"),
     service_manager: ServiceManager = Depends(get_service_manager),
 ):
-    return service_manager.list()
+    return service_manager.list(q)
 
 
 @router.get("/my", response_model=List[ServiceResponse])

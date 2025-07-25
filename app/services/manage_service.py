@@ -22,8 +22,8 @@ class ServiceManager:
 
         return service
 
-    def list(self) -> List[Service]:
-        return self.repo.list()
+    def list(self, search: Optional[str]) -> List[Service]:
+        return self.repo.list(search)
 
     def list_by_owner_id(self, owner_id: str) -> List[Service]:
         return self.repo.list_by_owner_id(owner_id=owner_id)

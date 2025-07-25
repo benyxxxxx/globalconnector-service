@@ -1,5 +1,5 @@
 from typing import List, Optional
-from sqlmodel import select, Session, and_
+from sqlmodel import select, Session, and_, or_
 from datetime import datetime, timezone
 from app.utils.ids import generate_unique_id
 from app.models.service import Service
@@ -15,8 +15,18 @@ class ServiceRepository:
         service = self.session.exec(statement).first()
         return service
 
-    def list(self) -> List[Service]:
+    def list(self, search: Optional[str] = None) -> List[Service]:
         statement = select(Service)
+
+        if search:
+            keyword = f"%{search}%"
+            statement = statement.where(
+                or_(
+                    Service.name.ilike(keyword),
+                    Service.description.ilike(keyword)
+                )
+            )
+
         return self.session.exec(statement).all()
 
     # def list_by_business(self, business_id: str) -> List[Service]:
